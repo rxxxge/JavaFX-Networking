@@ -68,8 +68,8 @@ public class Login extends Application {
         grid.addColumn(0, port, Port);
         grid.addColumn(0, hbBtn);
 
-        Scene scene = new Scene(grid);
-        stage.setTitle("Chat Application");
+        Scene scene = new Scene(grid, 300, 300);
+        stage.setTitle("Chat Login");
         stage.setScene(scene);
         stage.show();
     }
