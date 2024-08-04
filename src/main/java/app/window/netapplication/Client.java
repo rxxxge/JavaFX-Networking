@@ -4,6 +4,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -31,7 +32,9 @@ public class Client {
     private Button m_Button;
 
     private DatagramSocket m_Socket;
-    private InetAddress ip;
+    private InetAddress m_Ip;
+
+    private Thread m_Send;
 
     public Client(String name, String address, Integer port) {
         m_Name = name;
@@ -52,7 +55,7 @@ public class Client {
     private boolean openConnection(String address, int port) {
         try {
             m_Socket = new DatagramSocket(port);
-            ip = InetAddress.getByName(address);
+            m_Ip = InetAddress.getByName(address);
         } catch (UnknownHostException | SocketException e) {
             System.err.println(e.getMessage());
             return false;
@@ -61,7 +64,7 @@ public class Client {
         return true;
     }
 
-    private String receive() {
+    private String receive() throws IOException {
         byte[] data = new byte[1024];
         DatagramPacket packet = new DatagramPacket(data, data.length);
 
@@ -72,6 +75,20 @@ public class Client {
         }
 
         return new String(packet.getData());
+    }
+
+    private void send(final byte[] data) throws IOException {
+        m_Send = new Thread("Send") {
+            public void run() {
+                DatagramPacket packet = new DatagramPacket(data, data.length, m_Ip, m_Port);
+                try {
+                    m_Socket.send(packet);
+                } catch (IOException e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+        };
+        m_Send.start();
     }
 
     private void createWindow() throws IOException {
@@ -85,7 +102,7 @@ public class Client {
         m_TextArea.setPrefHeight(600);
         m_TextArea.addEventFilter(KeyEvent.ANY, event -> m_UserInput.requestFocus());
 
-        // Button
+        // Send Button
         m_Button = new Button();
         m_Button.setText("Send");
         m_Button.setOnAction(new EventHandler<ActionEvent>() {
