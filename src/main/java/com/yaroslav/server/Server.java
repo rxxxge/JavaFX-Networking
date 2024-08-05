@@ -4,11 +4,15 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Server implements Runnable {
 
+    private final List<ServerClient> clients = new ArrayList<ServerClient>();
+
     private DatagramSocket m_Socket;
-    private int m_Port;
+    private final int m_Port;
     private boolean m_Running = true;
     private Thread m_Run, m_Manage, m_Send, m_Receive;
 
@@ -55,12 +59,25 @@ public class Server implements Runnable {
                     } catch (IOException e) {
                         System.err.println(e.getMessage());
                     }
-                    String string = new String(packet.getData());
-                    System.out.println(string);
+                    process(packet);
+                    clients.add(new ServerClient("Yato", packet.getAddress(), packet.getPort(), 50));
+                    System.out.println(clients.get(0).m_Address.toString() + ":" + clients.get(0).m_Port);
                 }
             }
         };
         m_Receive.start();
+    }
+
+    private void process(DatagramPacket packet) {
+        String string = new String(packet.getData(), packet.getOffset(), packet.getLength());
+
+        if (string.startsWith("/c/")) {
+            clients.add(new ServerClient(string.substring(3, string.length()), packet.getAddress(), packet.getPort(), 50));
+            System.out.println(string.substring(3, string.length()));
+        }
+        else {
+            System.out.println(string);
+        }
     }
 
 }

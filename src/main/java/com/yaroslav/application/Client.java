@@ -20,7 +20,7 @@ public class Client extends ClientInterface {
 
         createWindow();
         console("Attempting to connect to " + m_Address + ":" + m_Port + ", user: " + m_Name);
-        String connection = m_Name + " connected from " + m_Address + ":" + m_Port;
+        String connection = "/c/" + m_Name;
         send(connection.getBytes());
     }
 
