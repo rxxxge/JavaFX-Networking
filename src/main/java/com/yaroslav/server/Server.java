@@ -1,5 +1,7 @@
 package com.yaroslav.server;
 
+import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
@@ -16,12 +18,17 @@ public class Server implements Runnable {
             m_Socket = new DatagramSocket(port);
         } catch (SocketException e) {
             System.err.println(e.getMessage());
+            return;
         }
         m_Run = new Thread(this, "Server");
+        m_Run.start();
     }
 
     public void run() {
         m_Running = true;
+
+        System.out.println("Server started on port " + m_Port);
+
         manageClients();
         receive();
     }
@@ -41,7 +48,15 @@ public class Server implements Runnable {
         m_Receive = new Thread("Receive") {
             public void run() {
                 while (m_Running) {
-                    
+                    byte[] data = new byte[1024];
+                    DatagramPacket packet = new DatagramPacket(data, data.length);
+                    try {
+                        m_Socket.receive(packet);
+                    } catch (IOException e) {
+                        System.err.println(e.getMessage());
+                    }
+                    String string = new String(packet.getData());
+                    System.out.println(string);
                 }
             }
         };

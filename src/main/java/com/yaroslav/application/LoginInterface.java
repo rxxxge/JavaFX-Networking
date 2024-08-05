@@ -17,6 +17,7 @@ import javafx.util.converter.IntegerStringConverter;
 import java.util.function.UnaryOperator;
 
 public class LoginInterface {
+
     protected TextField userName, ipAddress, Port;
     protected Label userLabel, addressLabel, portLabel;
     protected Label errorLabel;

@@ -3,11 +3,11 @@ package com.yaroslav.server;
 public class ServerMain {
 
     private int m_Port;
-    private Server server;
+    private Server m_Server;
 
     public ServerMain(int port) {
         m_Port = port;
-        server = new Server(port);
+        m_Server = new Server(port);
     }
 
     public static void main(String[] args) {

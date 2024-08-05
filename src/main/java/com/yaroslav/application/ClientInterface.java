@@ -15,9 +15,8 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-import java.io.IOException;
-
 public class ClientInterface {
+
     protected final String m_Name;
     protected final String m_Address;
     protected final Integer m_Port;
@@ -32,7 +31,7 @@ public class ClientInterface {
         m_Port = port;
     }
 
-    protected void createWindow() throws IOException {
+    protected void createWindow() {
         Stage clientStage = new Stage();
 
         // Chat area
@@ -84,10 +83,15 @@ public class ClientInterface {
         m_UserInput.requestFocus();
     }
 
-    private void send(String message) {
+    protected void console(String message) {
+        m_TextArea.appendText(message + "\n\r");
+    }
+
+    protected void send(String message) {
         if (message.isEmpty())
             return;
-        m_TextArea.appendText(m_Name + ": " + message + "\n\r");
+        message = m_Name + ": " + message;
+        console(message);
     }
 
 }

@@ -13,20 +13,20 @@ public class Client extends ClientInterface {
     public Client(String name, String address, Integer port) {
         super(name, address, port);
 
-        boolean connect = openConnection(m_Address, port);
+        boolean connect = openConnection(m_Address);
         if (!connect) {
             System.err.println("Connection failed!");
         }
-        try {
-            createWindow();
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+
+        createWindow();
+        console("Attempting to connect to " + m_Address + ":" + m_Port + ", user: " + m_Name);
+        String connection = m_Name + " connected from " + m_Address + ":" + m_Port;
+        send(connection.getBytes());
     }
 
-    private boolean openConnection(String address, int port) {
+    private boolean openConnection(String address) {
         try {
-            m_Socket = new DatagramSocket(port);
+            m_Socket = new DatagramSocket();
             m_Ip = InetAddress.getByName(address);
         } catch (UnknownHostException | SocketException e) {
             System.err.println(e.getMessage());
@@ -36,7 +36,7 @@ public class Client extends ClientInterface {
         return true;
     }
 
-    private String receive() throws IOException {
+    private String receive() {
         byte[] data = new byte[1024];
         DatagramPacket packet = new DatagramPacket(data, data.length);
 
@@ -49,7 +49,7 @@ public class Client extends ClientInterface {
         return new String(packet.getData());
     }
 
-    private void send(final byte[] data) throws IOException {
+    private void send(final byte[] data) {
         m_Send = new Thread("Send") {
             public void run() {
                 DatagramPacket packet = new DatagramPacket(data, data.length, m_Ip, m_Port);
@@ -62,4 +62,14 @@ public class Client extends ClientInterface {
         };
         m_Send.start();
     }
+
+    @Override
+    protected void send(String message) {
+        if (message.isEmpty())
+            return;
+        message = m_Name + ": " + message;
+        console(message);
+        send(message.getBytes());
+    }
+
 }
