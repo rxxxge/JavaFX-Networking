@@ -1,10 +1,9 @@
-package app.window.netapplication;
+package com.yaroslav.application;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
@@ -17,81 +16,23 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.net.*;
 
-
-public class Client {
-    private final String m_Name;
-    private final String m_Address;
-    private final Integer m_Port;
-
-    private Scene m_Scene;
+public class ClientInterface {
+    protected final String m_Name;
+    protected final String m_Address;
+    protected final Integer m_Port;
 
     private TextArea m_TextArea;
     private TextField m_UserInput;
     private Button m_Button;
 
-    private DatagramSocket m_Socket;
-    private InetAddress m_Ip;
-
-    private Thread m_Send;
-
-    public Client(String name, String address, Integer port) {
+    public ClientInterface(String name, String address, Integer port) {
         m_Name = name;
         m_Address = address;
         m_Port = port;
-
-        boolean connect = openConnection(address, port);
-        if (!connect) {
-            System.err.println("Connection failed!");
-        }
-        try {
-            createWindow();
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
     }
 
-    private boolean openConnection(String address, int port) {
-        try {
-            m_Socket = new DatagramSocket(port);
-            m_Ip = InetAddress.getByName(address);
-        } catch (UnknownHostException | SocketException e) {
-            System.err.println(e.getMessage());
-            return false;
-        }
-
-        return true;
-    }
-
-    private String receive() throws IOException {
-        byte[] data = new byte[1024];
-        DatagramPacket packet = new DatagramPacket(data, data.length);
-
-        try {
-            m_Socket.receive(packet);
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
-
-        return new String(packet.getData());
-    }
-
-    private void send(final byte[] data) throws IOException {
-        m_Send = new Thread("Send") {
-            public void run() {
-                DatagramPacket packet = new DatagramPacket(data, data.length, m_Ip, m_Port);
-                try {
-                    m_Socket.send(packet);
-                } catch (IOException e) {
-                    System.err.println(e.getMessage());
-                }
-            }
-        };
-        m_Send.start();
-    }
-
-    private void createWindow() throws IOException {
+    protected void createWindow() throws IOException {
         Stage clientStage = new Stage();
 
         // Chat area
@@ -134,7 +75,7 @@ public class Client {
         VBox.setVgrow(m_TextArea, Priority.ALWAYS);
         vbox.setPadding(new Insets(10));
 
-        m_Scene = new Scene(vbox);
+        Scene m_Scene = new Scene(vbox);
 
         clientStage.setTitle("Chat Application");
         clientStage.setScene(m_Scene);
@@ -148,4 +89,5 @@ public class Client {
             return;
         m_TextArea.appendText(m_Name + ": " + message + "\n\r");
     }
+
 }

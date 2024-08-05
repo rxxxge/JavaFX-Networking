@@ -1,32 +1,30 @@
-package app.window.netapplication;
+package com.yaroslav.application;
 
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.converter.IntegerStringConverter;
 
 import java.util.function.UnaryOperator;
 
+public class LoginInterface {
+    protected TextField userName, ipAddress, Port;
+    protected Label userLabel, addressLabel, portLabel;
+    protected Label errorLabel;
+    protected Button submitButton;
 
-public class Login extends Application {
-
-    private TextField userName, ipAddress, Port;
-    private Label userLabel, addressLabel, portLabel;
-    private Label errorLabel;
-    private Button submitButton;
+    public LoginInterface() {
+        Init();
+    }
 
     public void Init() {
         userLabel = new Label("Name");
@@ -58,16 +56,13 @@ public class Login extends Application {
         setFieldKeyEvents();
     }
 
-    @Override
-    public void start(Stage stage) {
-        Init();
-
+    public void setupSubmitButton(Stage stage) {
         submitButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 if (!validateCredentials())
                     return;
-
+                System.out.println("New client joined");
                 System.out.println("Name: " + userName.getText());
                 System.out.println("Address: " + ipAddress.getText());
                 System.out.println("Port: " + Port.getText() + "\n");
@@ -80,10 +75,12 @@ public class Login extends Application {
                 stage.close();
 
                 // Open new client window with given credentials
-                login(name, address, port);
+                loginClient(name, address, port);
             }
         });
+    }
 
+    public GridPane configureInterface() {
         VBox vBox = new VBox(10, submitButton, errorLabel);
         vBox.setAlignment(Pos.BOTTOM_CENTER);
 
@@ -98,14 +95,10 @@ public class Login extends Application {
         grid.addColumn(0, portLabel, Port);
         grid.addColumn(0, vBox);
 
-
-        Scene scene = new Scene(grid, 300, 300);
-        stage.setTitle("Chat Login");
-        stage.setScene(scene);
-        stage.show();
+        return grid;
     }
 
-    private void login(String name, String address, Integer port) {
+    private void loginClient(String name, String address, Integer port) {
         new Client(name, address, port);
     }
 
@@ -129,10 +122,11 @@ public class Login extends Application {
         });
     }
 
+
     private boolean validateCredentials() {
         if (userName.getText().isEmpty() ||
-            ipAddress.getText().isEmpty() ||
-            Port.getText().isEmpty())
+                ipAddress.getText().isEmpty() ||
+                Port.getText().isEmpty())
         {
             errorLabel.setText("Fill empty fields!");
             return false;
@@ -140,10 +134,5 @@ public class Login extends Application {
 
         return true;
     }
-
-    public static void main(String[] args) {
-        launch(args);
-    }
-
 
 }

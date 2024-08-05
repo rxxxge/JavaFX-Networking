@@ -5,6 +5,6 @@ module app.window.netapplication {
     requires org.controlsfx.controls;
     requires org.kordamp.bootstrapfx.core;
 
-    opens app.window.netapplication to javafx.fxml;
-    exports app.window.netapplication;
+    opens com.yaroslav.application to javafx.fxml;
+    exports com.yaroslav.application;
 }
