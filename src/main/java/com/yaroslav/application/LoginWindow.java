@@ -16,14 +16,14 @@ import javafx.util.converter.IntegerStringConverter;
 
 import java.util.function.UnaryOperator;
 
-public class LoginInterface {
+public class LoginWindow {
 
     protected TextField userName, ipAddress, Port;
     protected Label userLabel, addressLabel, portLabel;
     protected Label errorLabel;
     protected Button submitButton;
 
-    public LoginInterface() {
+    public LoginWindow() {
         Init();
     }
 
@@ -100,7 +100,7 @@ public class LoginInterface {
     }
 
     private void loginClient(String name, String address, Integer port) {
-        new Client(name, address, port);
+        new ClientWindow(name, address, port);
     }
 
     private void setFieldKeyEvents() {

@@ -3,25 +3,40 @@ package com.yaroslav.application;
 import java.io.IOException;
 import java.net.*;
 
-public class Client extends ClientInterface {
+public class Client {
+
+    private final String m_Name;
+    private final String m_Address;
+    private final Integer m_Port;
 
     private DatagramSocket m_Socket;
     private InetAddress m_Ip;
-
     private Thread m_Send;
 
     public Client(String name, String address, Integer port) {
-        super(name, address, port);
+        m_Name = name;
+        m_Address = address;
+        m_Port = port;
 
         boolean connect = openConnection(m_Address);
         if (!connect) {
             System.err.println("Connection failed!");
         }
 
-        createWindow();
-        console("Attempting to connect to " + m_Address + ":" + m_Port + ", user: " + m_Name);
         String connection = "/c/" + m_Name;
         send(connection.getBytes());
+    }
+
+    public String getName() {
+        return m_Name;
+    }
+
+    public String getAddress() {
+        return m_Name;
+    }
+
+    public String getPort() {
+        return m_Name;
     }
 
     private boolean openConnection(String address) {
@@ -61,15 +76,6 @@ public class Client extends ClientInterface {
             }
         };
         m_Send.start();
-    }
-
-    @Override
-    protected void send(String message) {
-        if (message.isEmpty())
-            return;
-        message = m_Name + ": " + message;
-        console(message);
-        send(message.getBytes());
     }
 
 }

@@ -15,23 +15,22 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class ClientInterface {
-
-    protected final String m_Name;
-    protected final String m_Address;
-    protected final Integer m_Port;
+public class ClientWindow {
 
     private TextArea m_TextArea;
     private TextField m_UserInput;
     private Button m_Button;
 
-    public ClientInterface(String name, String address, Integer port) {
-        m_Name = name;
-        m_Address = address;
-        m_Port = port;
+    private Client m_Client;
+
+    public ClientWindow(String name, String address, Integer port) {
+        m_Client = new Client(name, address, port);
+
+        createWindow();
+        console("Attempting to connect to " + m_Client.getAddress() + ":" + m_Client.getPort() + ", user: " + m_Client.getName());
     }
 
-    protected void createWindow() {
+    private void createWindow() {
         Stage clientStage = new Stage();
 
         // Chat area
@@ -49,7 +48,7 @@ public class ClientInterface {
             @Override
             public void handle(ActionEvent actionEvent) {
                 if (!m_UserInput.getText().isEmpty())
-                    System.out.println(m_Name + ": " + m_UserInput.getText());
+                    System.out.println(m_Client.getName() + ": " + m_UserInput.getText());
                 send(m_UserInput.getText());
                 m_UserInput.clear();
             }
@@ -83,14 +82,14 @@ public class ClientInterface {
         m_UserInput.requestFocus();
     }
 
-    protected void console(String message) {
+    private void console(String message) {
         m_TextArea.appendText(message + "\n\r");
     }
 
-    protected void send(String message) {
+    private void send(String message) {
         if (message.isEmpty())
             return;
-        message = m_Name + ": " + message;
+        message = m_Client.getName() + ": " + message;
         console(message);
     }
 

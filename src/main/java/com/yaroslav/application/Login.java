@@ -8,7 +8,7 @@ public class Login extends Application {
 
     @Override
     public void start(Stage stage) {
-        LoginInterface clientLogin = new LoginInterface();
+        LoginWindow clientLogin = new LoginWindow();
 
         clientLogin.setupSubmitButton(stage);
 
