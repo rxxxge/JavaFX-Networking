@@ -26,8 +26,15 @@ public class ClientWindow {
     public ClientWindow(String name, String address, Integer port) {
         m_Client = new Client(name, address, port);
 
+        boolean connect = m_Client.openConnection(m_Client.getAddress());
+        if (!connect) {
+            System.err.println("Connection failed!");
+        }
+
         createWindow();
         console("Attempting to connect to " + m_Client.getAddress() + ":" + m_Client.getPort() + ", user: " + m_Client.getName());
+        String connection = "/c/" + m_Client.getName();
+        m_Client.send(connection.getBytes());
     }
 
     private void createWindow() {
@@ -91,6 +98,8 @@ public class ClientWindow {
             return;
         message = m_Client.getName() + ": " + message;
         console(message);
+        message = "/m/" + message;
+        m_Client.send(message.getBytes());
     }
 
 }

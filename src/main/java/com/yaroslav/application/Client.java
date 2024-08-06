@@ -17,14 +17,6 @@ public class Client {
         m_Name = name;
         m_Address = address;
         m_Port = port;
-
-        boolean connect = openConnection(m_Address);
-        if (!connect) {
-            System.err.println("Connection failed!");
-        }
-
-        String connection = "/c/" + m_Name;
-        send(connection.getBytes());
     }
 
     public String getName() {
@@ -32,14 +24,14 @@ public class Client {
     }
 
     public String getAddress() {
-        return m_Name;
+        return m_Address;
     }
 
-    public String getPort() {
-        return m_Name;
+    public Integer getPort() {
+        return m_Port;
     }
 
-    private boolean openConnection(String address) {
+    public boolean openConnection(String address) {
         try {
             m_Socket = new DatagramSocket();
             m_Ip = InetAddress.getByName(address);
@@ -64,7 +56,7 @@ public class Client {
         return new String(packet.getData());
     }
 
-    private void send(final byte[] data) {
+    public void send(final byte[] data) {
         m_Send = new Thread("Send") {
             public void run() {
                 DatagramPacket packet = new DatagramPacket(data, data.length, m_Ip, m_Port);
