@@ -8,10 +8,12 @@ public class Client {
     private final String m_Name;
     private final String m_Address;
     private final Integer m_Port;
+    private long m_ID = -1;
 
     private DatagramSocket m_Socket;
     private InetAddress m_Ip;
     private Thread m_Send;
+
 
     public Client(String name, String address, Integer port) {
         m_Name = name;
@@ -31,6 +33,24 @@ public class Client {
         return m_Port;
     }
 
+    public long getID() {
+        return m_ID;
+    }
+
+    public void setID(long id) {
+        m_ID = id;
+    }
+
+    public void disconnect() {
+        new Thread() {
+            public void run() {
+                synchronized (m_Socket) {
+                    m_Socket.close();
+                }
+            }
+        }.start();
+    }
+
     public boolean openConnection(String address) {
         try {
             m_Socket = new DatagramSocket();
@@ -43,7 +63,7 @@ public class Client {
         return true;
     }
 
-    private String receive() {
+    public String receive() {
         byte[] data = new byte[1024];
         DatagramPacket packet = new DatagramPacket(data, data.length);
 

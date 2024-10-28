@@ -1,31 +1,17 @@
 package com.yaroslav.utils;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.UUID;
 
 public class UniqueIdentifier {
-
-    private static final int RANGE = 10000;
-    private static List<Integer> ids = new ArrayList<Integer>();
-
-    private static int index = 0;
-
-    static {
-        for (int i = 0; i < RANGE; i++) {
-            ids.add(i);
-        }
-        Collections.shuffle(ids);
-    }
 
     private UniqueIdentifier() {
     }
 
-    public static int getIdentifier() {
-        if (index >= ids.size())
-            index = 0;
+    public static long getIdentifier() {
+        UUID id = UUID.randomUUID();
+        int mostSig = (int) (id.getMostSignificantBits() >> 32);   // Take higher 32 bits of most significant part
+        int leastSig = (int) (id.getLeastSignificantBits() & 0xFFFFFFFFL);  // Lower 32 bits of least significant part
 
-        return ids.get(index++);
+        return mostSig ^ leastSig;  // XOR the two parts for a reasonably unique int
     }
 
 }

@@ -9,16 +9,16 @@ public class ServerClient {
     public int m_Port;
     public int m_Attempt;
 
-    private final int m_ID;
+    private final long m_ID;
 
-    public ServerClient(String name, InetAddress address, int port, final int ID) {
+    public ServerClient(String name, InetAddress address, int port, final long ID) {
         m_Name = name;
         m_Address = address;
         m_Port = port;
         m_ID = ID;
     }
 
-    public int getID() {
+    public long getID() {
         return m_ID;
     }
 

@@ -15,13 +15,16 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
-public class ClientWindow {
+public class ClientWindow implements Runnable {
 
     private TextArea m_TextArea;
     private TextField m_UserInput;
     private Button m_Button;
 
+    private Thread m_Run, m_Listen;
     private Client m_Client;
+
+    private boolean m_Running;
 
     public ClientWindow(String name, String address, Integer port) {
         m_Client = new Client(name, address, port);
@@ -32,9 +35,12 @@ public class ClientWindow {
         }
 
         createWindow();
-        console("Attempting to connect to " + m_Client.getAddress() + ":" + m_Client.getPort() + ", user: " + m_Client.getName());
+        console("Attempting to connect to " + m_Client.getAddress() + ": " + m_Client.getPort() + ", user: " + m_Client.getName());
         String connection = "/c/" + m_Client.getName();
         m_Client.send(connection.getBytes());
+        m_Run = new Thread(this, "Running");
+        m_Running = true;
+        m_Run.start();
     }
 
     private void createWindow() {
@@ -56,12 +62,22 @@ public class ClientWindow {
             public void handle(ActionEvent actionEvent) {
                 if (!m_UserInput.getText().isEmpty())
                     System.out.println(m_Client.getName() + ": " + m_UserInput.getText());
-                send(m_UserInput.getText());
+                send(m_UserInput.getText(), true);
                 m_UserInput.clear();
             }
         });
         m_Button.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> m_UserInput.requestFocus());
         m_Button.addEventFilter(KeyEvent.ANY, event -> m_UserInput.requestFocus());
+
+        // Window close event handle
+        clientStage.setOnHiding(windowEvent -> {
+            console(m_Client.getName() + " disconnected!");
+            String disconnectMessage = "/d/" + m_Client.getID() + "/e/";
+            send(disconnectMessage, false);
+            m_Running = false;
+//            System.out.println("CLOSE SOCKET HERE!");
+            m_Client.disconnect();
+        });
 
         // Field for user input
         m_UserInput = new TextField();
@@ -89,16 +105,40 @@ public class ClientWindow {
         m_UserInput.requestFocus();
     }
 
+    public void run() {
+        listen();
+    }
+
+    public void listen() {
+        m_Listen = new Thread("Listen") {
+            public void run() {
+                while (m_Running) {
+                    String message = m_Client.receive();
+                    if (message.startsWith("/c/")) {
+                        m_Client.setID(Integer.parseInt(message.split("/c/|/e/")[1]));
+                        console("Successfully connected to server! ID: " + m_Client.getID());
+                    } else if (message.startsWith("/m/")) {
+                        String text = message.split("/m/|/e/")[1];
+                        console(text);
+                    }
+                }
+            }
+        };
+
+        m_Listen.start();
+    }
+
     private void console(String message) {
         m_TextArea.appendText(message + "\n\r");
     }
 
-    private void send(String message) {
+    private void send(String message, boolean userMessage) {
         if (message.isEmpty())
             return;
-        message = m_Client.getName() + ": " + message;
-        console(message);
-        message = "/m/" + message;
+        if (userMessage) {
+            message = m_Client.getName() + ": " + message;
+            message = "/m/" + message;
+        }
         m_Client.send(message.getBytes());
     }
 
